@@ -35,6 +35,21 @@ function updateBitbucketProperties() {
   fi
 }
 
+function updateElasticsearchProperties() {
+  local propertyfile=$1
+  local propertyname=$2
+  local propertyvalue=$3
+  set +e
+  grep -q ^"${propertyname}" ${propertyfile}
+  if [ $? -eq 0 ]; then
+    set -e
+    sed -i "s/\(${propertyname/./\\.}\).*\$/\1${propertyvalue}/" ${propertyfile}
+  else
+    set -e
+    echo "${propertyname}${propertyvalue}" >> ${propertyfile}
+  fi
+}
+
 function processBitbucketProxySettings() {
   if [ -n "${BITBUCKET_CONTEXT_PATH}" ] || [ -n "${BITBUCKET_PROXY_NAME}" ] || [ -n "${BITBUCKET_PROXY_PORT}" ] || [ -n "${BITBUCKET_DELAYED_START}" ] || [ -n "${BITBUCKET_CROWD_SSO}" ] ; then
     if [ ! -d ${BITBUCKET_HOME}/shared ]; then
@@ -81,6 +96,16 @@ if [ -n "${BITBUCKET_DELAYED_START}" ]; then
 fi
 
 processBitbucketProxySettings
+
+# Configure embedded Elasticsearch JVM heap size options
+if [ "${bitbucket_embedded_search}" = 'true' ]; then
+  if [ -n "${ES_JVM_MINIMUM_MEMORY}" ]; then
+    updateElasticsearchProperties ${BITBUCKET_HOME}/shared/search/jvm.options "-Xms" ${ES_JVM_MINIMUM_MEMORY}
+  fi
+  if [ -n "${ES_JVM_MAXIMUM_MEMORY}" ]; then
+    updateElasticsearchProperties ${BITBUCKET_HOME}/shared/search/jvm.options "-Xmx" ${ES_JVM_MAXIMUM_MEMORY}
+  fi
+fi
 
 # If there is a 'ssh' directory, copy it to /home/bitbucket/.ssh
 if [ -d /var/atlassian/bitbucket/ssh ]; then

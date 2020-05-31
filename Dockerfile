@@ -1,7 +1,7 @@
 FROM adoptopenjdk/openjdk8:alpine
 MAINTAINER Steffen Bleul <sbl@blacklabelops.com>
 
-ARG BITBUCKET_VERSION=6.8.2
+ARG BITBUCKET_VERSION=7.2.4
 # permissions
 ARG CONTAINER_UID=1000
 ARG CONTAINER_GID=1000

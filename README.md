@@ -6,7 +6,7 @@
 
 | Product |Version | Tags  | Dockerfile |
 |---------|--------|-------|------------|
-| Bitbucket | 6.8.2 | 6.8.2, latest | [Dockerfile](https://github.com/blacklabelops/bitbucket/blob/master/Dockerfile) |
+| Bitbucket | 7.2.4 | 7.2.4, latest | [Dockerfile](https://github.com/blacklabelops/bitbucket/blob/master/Dockerfile) |
 
 ## Related Images
 
@@ -219,6 +219,8 @@ $ docker run --rm --name bitbucket_backup \
 
 # JVM memory settings
 
+## Bitbucket
+
 By default Bitbucket starts with `-Xms=512m -Xmx=1g`. In some cases, this may not be enough to work with.
 
 If needed, you can specify your own memory settings:
@@ -232,6 +234,25 @@ $ docker run -d \
 ~~~~
 
 This will start Bitbucket with `-Xms=2g -Xmx=3g`.
+
+## Embedded Elasticsearch
+
+By default Elasticsearch starts with `-Xms1g -Xmx1g`.
+
+If needed, you can specify your own memory settings:
+
+~~~~
+$ docker run -d \
+    -e "BITBUCKET_EMBEDDED_SEARCH=true" \
+    -e "ES_JVM_MINIMUM_MEMORY=2g" \
+    -e "ES_JVM_MAXIMUM_MEMORY=2g" \
+    -p 7990:7990 \
+    blacklabelops/bitbucket
+~~~~
+
+This will start embedded Elasticsearch with `-Xms2g -Xmx2g`.
+
+Note: BITBUCKET_EMBEDDED_SEARCH need to be set to true. Otherwise, the environment variables will be ignored.
 
 # Proxy Configuration
 
